@@ -23,6 +23,10 @@ app.use(express.json());
 // Inicializa el string de conexión ODBC para el driver de MS Access
 const connString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=${DB_PATH};`;
 
+// Control de consultas rápidas por el mismo S/N
+const lastRequestTimes = new Map();
+const MIN_REQUEST_INTERVAL_MS = 3000;
+
 // Pool de conexiones (recomendado para entornos web y peticiones múltiples)
 let pool;
 (async () => {
@@ -45,6 +49,18 @@ app.get('/api/equipo/:sn', async (req, res) => {
         }
         
         sn = sn.trim();
+
+        const requestKey = sn.toLowerCase();
+        const lastRequestTime = lastRequestTimes.get(requestKey);
+        const now = Date.now();
+
+        if (lastRequestTime && now - lastRequestTime < MIN_REQUEST_INTERVAL_MS) {
+            return res.status(400).json({
+                error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
+            });
+        }
+
+        lastRequestTimes.set(requestKey, now);
 
         if (!pool) {
             return res.status(500).json({ error: "El servicio de Base de Datos no está disponible." });
