@@ -1,0 +1,21 @@
+{
+  "name": "api-proyecto",
+  "version": "1.0.0",
+  "description": "API de solo lectura construida con Node.js, Express y node-adodb para consultar una base de datos Microsoft Access externa preexistente.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "odbc": "^2.5.0"
+  }
+}
