@@ -20,6 +20,7 @@ Las variables de configuración necesarias deben residir en el archivo `.env`. E
 PORT=3000
 DB_PATH=C:/ruta/absoluta/a/tu/base_de_datos.accdb
 DB_TABLE=NombreTabla
+PIN_HASH=PinEncriptadoEnSHA256
 ```
 
 - **DB_PATH**: Es **MANDATORIO** poner aquí la **ruta absoluta** donde reside el archivo `.accdb` en el sistema (fuera de la carpeta del proyecto).
