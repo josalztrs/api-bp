@@ -17,7 +17,7 @@ const MIN_QUERY_INTERVAL_MS = process.env.MIN_QUERY_INTERVAL_MS;
 dbReady = false;
 
 // Verificar que existe la ruta de la BD configurada
-if (dotenv) {
+if (!DB_PATH) {
     console.error("ERROR: No se ha configurado DB_PATH en el archivo .env");
     process.exit(1);
 }
