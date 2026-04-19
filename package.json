@@ -12,10 +12,17 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "compression": "^1.8.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "dotenv-safe": "^9.1.0",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.3.2",
     "helmet": "^8.1.0",
-    "odbc": "^2.5.0"
+    "joi": "^18.1.2",
+    "jsonwebtoken": "^9.0.3",
+    "node-cache": "^5.1.2",
+    "odbc": "^2.5.0",
+    "winston": "^3.19.0"
   }
 }
