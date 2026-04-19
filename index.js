@@ -144,7 +144,20 @@ app.get('/api/status', async (req, res) => {
 // Endpoint para iniciar sesión basado en el PIN de .env
 app.get('/api/login/:pin', async (req, res) => {
     const { pin } = req.params;
+
+
+    const requestKey = pin.toLowerCase();
+    const lastRequestTime = lastRequestTimes.get(requestKey);
+    const now = Date.now();
+
+    if (lastRequestTime && now - lastRequestTime < 1500) {
+        return res.status(400).json({
+            error: "Has intentado iniciar sesion en muy poco tiempo. Espera unos segundos antes de volver a intentar."
+        });
+    }
+
     if (generateSHA256(pin) == PIN_HASH) {
+        lastRequestTimes.set(requestKey, now);
         return res.status(200).json({
             status: "correct",
             message: 'Inicio de sesión por PIN exitoso'
