@@ -12,25 +12,26 @@ const PORT = process.env.PORT;
 const DB_PATH = process.env.DB_PATH;
 const DB_TABLE = process.env.DB_TABLE;
 const PIN_HASH = process.env.PIN_HASH;
+const MIN_REQUEST_INTERVAL_MS = process.env.MIN_REQUEST_INTERVAL_MS;
+const MIN_QUERY_INTERVAL_MS = process.env.MIN_QUERY_INTERVAL_MS;
 dbReady = false;
 
 // Verificar que existe la ruta de la BD configurada
-if (!DB_PATH) {
+if (dotenv) {
     console.error("ERROR: No se ha configurado DB_PATH en el archivo .env");
     process.exit(1);
 }
 
-// Configuración de middlewares
+// middlewares
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Inicializa el string de conexión ODBC para el driver de MS Access
+//string de conexion ODBC para el driver de MS Access
 const connString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=${DB_PATH};`;
 
 // Control de consultas rápidas por el mismo S/N
 const lastRequestTimes = new Map();
-const MIN_REQUEST_INTERVAL_MS = 3000;
 
 // Función para hash SHA256 del PIN
 function generateSHA256(input) {
@@ -68,6 +69,8 @@ app.get('/api/equipo/:sn', async (req, res) => {
 
         if (lastRequestTime && now - lastRequestTime < MIN_REQUEST_INTERVAL_MS) {
             return res.status(400).json({
+                status: "locked",
+                time: MIN_REQUEST_INTERVAL_MS,
                 error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
             });
         }
@@ -132,6 +135,8 @@ app.get('/api/status', async (req, res) => {
 
     if (lastRequestTime && now - lastRequestTime < MIN_REQUEST_INTERVAL_MS) {
         return res.status(400).json({
+            status: "locked",
+            time: MIN_REQUEST_INTERVAL_MS,
             error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
         });
     }
@@ -162,9 +167,11 @@ app.get('/api/login/:pin', async (req, res) => {
     const lastRequestTime = lastRequestTimes.get(requestKey);
     const now = Date.now();
 
-    if (lastRequestTime && now - lastRequestTime < 1500) {
+    if (lastRequestTime && now - lastRequestTime < MIN_QUERY_INTERVAL_MS) {
         return res.status(400).json({
-            error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
+            status: "locked",
+            time: MIN_QUERY_INTERVAL_MS,
+            error: "Has intentado iniciar sesión en muy poco tiempo. Por favor, espera unos segundos antes de intentar de nuevo."
         });
     }
 
