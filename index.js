@@ -32,11 +32,12 @@ const connString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=${DB_P
 const lastRequestTimes = new Map();
 const MIN_REQUEST_INTERVAL_MS = 3000;
 
+// Función para hash SHA256 del PIN
 function generateSHA256(input) {
     return crypto.createHash('sha256').update(input).digest('hex');
 }
 
-// Pool de conexiones (recomendado para entornos web y peticiones múltiples)
+// Pool de conexiones
 let pool;
 (async () => {
     try {
@@ -125,6 +126,18 @@ app.get('/api/status', async (req, res) => {
         });
     }
 
+    const requestKey = pool.toLowerCase();
+    const lastRequestTime = lastRequestTimes.get(requestKey);
+    const now = Date.now();
+
+    if (lastRequestTime && now - lastRequestTime < MIN_REQUEST_INTERVAL_MS) {
+        return res.status(400).json({
+            error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
+        });
+    }
+
+    lastRequestTimes.set(requestKey, now);
+
     try {
         await pool.query('SELECT 1');
         return res.status(200).json({
@@ -145,19 +158,19 @@ app.get('/api/status', async (req, res) => {
 app.get('/api/login/:pin', async (req, res) => {
     const { pin } = req.params;
 
-
     const requestKey = pin.toLowerCase();
     const lastRequestTime = lastRequestTimes.get(requestKey);
     const now = Date.now();
 
     if (lastRequestTime && now - lastRequestTime < 1500) {
         return res.status(400).json({
-            error: "Has intentado iniciar sesion en muy poco tiempo. Espera unos segundos antes de volver a intentar."
+            error: "Has consultado el mismo artículo en muy poco tiempo. Espera unos segundos e intenta nuevamente."
         });
     }
 
+    lastRequestTimes.set(requestKey, now);
+
     if (generateSHA256(pin) == PIN_HASH) {
-        lastRequestTimes.set(requestKey, now);
         return res.status(200).json({
             status: "correct",
             message: 'Inicio de sesión por PIN exitoso'
@@ -170,6 +183,7 @@ app.get('/api/login/:pin', async (req, res) => {
 
     };
 });
+
 // Arrancar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor API en ejecución en el puerto ${PORT}`);
