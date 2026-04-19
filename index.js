@@ -3,11 +3,16 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const odbc = require('odbc');
+const crypto = require('crypto');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+
+const PORT = process.env.PORT;
 const DB_PATH = process.env.DB_PATH;
-const DB_TABLE = process.env.DB_TABLE || 'Equipos';
+const DB_TABLE = process.env.DB_TABLE;
+const PIN_HASH = process.env.PIN_HASH;
+dbReady = false;
 
 // Verificar que existe la ruta de la BD configurada
 if (!DB_PATH) {
@@ -27,13 +32,19 @@ const connString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=${DB_P
 const lastRequestTimes = new Map();
 const MIN_REQUEST_INTERVAL_MS = 3000;
 
+function generateSHA256(input) {
+    return crypto.createHash('sha256').update(input).digest('hex');
+}
+
 // Pool de conexiones (recomendado para entornos web y peticiones múltiples)
 let pool;
 (async () => {
     try {
         pool = await odbc.pool(connString);
         console.log("Pool ODBC inicializado correctamente.");
+        dbReady = true;
     } catch (error) {
+        dbReady = false;
         console.error("No se pudo iniciar el Pool ODBC. Asegúrate del driver y path correcto.", error);
     }
 })();
@@ -47,7 +58,7 @@ app.get('/api/equipo/:sn', async (req, res) => {
         if (!sn || sn.trim() === '') {
             return res.status(400).json({ error: "El parámetro S/N no puede estar vacío." });
         }
-        
+
         sn = sn.trim();
 
         const requestKey = sn.toLowerCase();
@@ -69,7 +80,7 @@ app.get('/api/equipo/:sn', async (req, res) => {
         // El driver ODBC de MS Access no soporta "SQLDescribeParam" para mapear parámetros "?".
         // Por lo tanto, debemos formatear el string SQL manualmente, detectando primero si
         // necesitamos un tipo Numérico o de Texto (String).
-        
+
         let query;
         const parsedSn = isNaN(Number(sn)) ? sn : Number(sn);
 
@@ -96,15 +107,56 @@ app.get('/api/equipo/:sn', async (req, res) => {
 
     } catch (error) {
         console.error("Error al consultar la base de datos con odbc:", error);
-        
+
         // Devolvemos 500
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: "Error interno del servidor al conectar a la base de datos.",
             details: error.message || "Es posible que el archivo de Access esté bloqueado o no exista."
         });
     }
 });
 
+// Endpoint para revisar status 
+app.get('/api/status', async (req, res) => {
+    if (!pool) {
+        return res.status(503).json({
+            status: 'down',
+            message: 'Servicio de Base de Datos no inicializado'
+        });
+    }
+
+    try {
+        await pool.query('SELECT 1');
+        return res.status(200).json({
+            status: 'up',
+            message: 'Base de datos accesible'
+        });
+    } catch (error) {
+        console.error('DB status check failed:', error);
+        return res.status(503).json({
+            status: 'down',
+            message: 'No se pudo conectar a la base de datos',
+            details: error.message
+        });
+    }
+});
+
+// Endpoint para iniciar sesión basado en el PIN de .env
+app.get('/api/login/:pin', async (req, res) => {
+    const { pin } = req.params;
+    if (generateSHA256(pin) == PIN_HASH) {
+        return res.status(200).json({
+            status: "correct",
+            message: 'Inicio de sesión por PIN exitoso'
+        });
+    } else {
+        return res.status(500).json({
+            status: "incorrect",
+            message: "PIN erróneo. Intente de nuevo."
+        });
+
+    };
+});
 // Arrancar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor API en ejecución en el puerto ${PORT}`);
