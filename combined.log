@@ -39,3 +39,14 @@
 {"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T14:09:58.022Z"}
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-20T14:10:02.240Z"}
 {"level":"info","message":"Equipo encontrado: 1001","timestamp":"2026-04-20T14:11:07.867Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T17:11:39.180Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T17:11:39.198Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T17:11:39.199Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T17:12:59.950Z"}
+{"level":"info","message":"Equipo encontrado: 1001","timestamp":"2026-04-20T17:13:15.735Z"}
+{"level":"info","message":"Equipo encontrado: 1001","timestamp":"2026-04-20T17:13:18.645Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T17:17:05.873Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T17:17:05.885Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T17:17:05.886Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T17:17:36.325Z"}
+{"level":"info","message":"Equipo encontrado: 1001","timestamp":"2026-04-20T17:17:52.924Z"}

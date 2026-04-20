@@ -42,57 +42,57 @@ async function queryEquipo(sn) {
 
     if (typeof parsedSn === 'number') {
         query = `SELECT 
-    bm.serial,
-    bm.observaciones AS bien_observaciones,
-    bm.fecha_compra,
-    m.nombre_marca,
-    d.nombre_dpto AS departamento,
-    e.estado_bien AS estado_bien,
-    a.fecha_asign,
-    a.estado AS asignacion_estado_id,
-    p.cedula,
-    p.nombre AS empleado_nombre,
-    c.nombre_cargo,
-    ed.estado_bien AS asignacion_estado
-FROM 
-    ((((bienes_muebles AS bm 
-    INNER JOIN marca AS m ON bm.marca_id = m.id)
-    INNER JOIN departamento AS d ON bm.depto_id = d.id)
-    INNER JOIN estado AS e ON bm.estado_id = e.id)
-    LEFT JOIN (asignaciones AS a 
-        LEFT JOIN (personal AS p 
-            LEFT JOIN cargo AS c ON p.cargo_id = c.id) 
-        ON a.empleado_id = p.id)
-    ON bm.serial = a.serial)
-    LEFT JOIN estado AS ed ON a.estado = ed.id
-WHERE 
-    bm.serial = '${parsedSn}';`;
+            bm.serial,
+            bm.observaciones AS bien_observaciones,
+            bm.fecha_compra,
+            m.nombre_marca,
+            d.nombre_dpto AS departamento,
+            e.estado_bien AS estado_bien,
+            a.fecha_asign,
+            a.estado AS asignacion_estado_id,
+            p.cedula,
+            p.nombre AS empleado_nombre,
+            c.nombre_cargo,
+            ed.estado_bien AS asignacion_estado
+        FROM 
+            ((((bienes_muebles AS bm 
+            INNER JOIN marca AS m ON bm.marca_id = m.id)
+            INNER JOIN departamento AS d ON bm.depto_id = d.id)
+            INNER JOIN estado AS e ON bm.estado_id = e.id)
+            LEFT JOIN (asignaciones AS a 
+                LEFT JOIN (personal AS p 
+                    LEFT JOIN cargo AS c ON p.cargo_id = c.id) 
+                ON a.empleado_id = p.id)
+            ON bm.serial = a.serial)
+            LEFT JOIN estado AS ed ON a.estado = ed.id
+        WHERE 
+            bm.serial = '${parsedSn}';`;
     } else {
         const safedSn = parsedSn.replace(/'/g, "''");
         query = `SELECT 
-    bm.serial,
-    bm.observaciones AS bien_observaciones,
-    bm.fecha_compra,
-    m.nombre_marca,
-    d.nombre_dpto AS departamento,
-    e.estado_bien AS estado_bien,
-    a.fecha_asign,
-    a.estado AS asignacion_estado_id,
-    p.cedula,
-    p.nombre AS empleado_nombre,
-    c.nombre_cargo,
-    ed.estado_bien AS asignacion_estado
-FROM 
-    (bienes_muebles AS bm
-    INNER JOIN marca AS m ON bm.marca_id = m.id)
-    INNER JOIN departamento AS d ON bm.depto_id = d.id
-    INNER JOIN estado AS e ON bm.estado_id = e.id
-    LEFT JOIN asignaciones AS a ON bm.serial = a.serial
-    LEFT JOIN personal AS p ON a.empleado_id = p.id
-    LEFT JOIN cargo AS c ON p.cargo_id = c.id
-    LEFT JOIN estado AS ed ON a.estado = ed.id
-WHERE 
-    bm.serial = '${safedSn}';`;
+            bm.serial,
+            bm.observaciones AS bien_observaciones,
+            bm.fecha_compra,
+            m.nombre_marca,
+            d.nombre_dpto AS departamento,
+            e.estado_bien AS estado_bien,
+            a.fecha_asign,
+            a.estado AS asignacion_estado_id,
+            p.cedula,
+            p.nombre AS empleado_nombre,
+            c.nombre_cargo,
+            ed.estado_bien AS asignacion_estado
+        FROM 
+            (bienes_muebles AS bm
+            INNER JOIN marca AS m ON bm.marca_id = m.id)
+            INNER JOIN departamento AS d ON bm.depto_id = d.id
+            INNER JOIN estado AS e ON bm.estado_id = e.id
+            LEFT JOIN asignaciones AS a ON bm.serial = a.serial
+            LEFT JOIN personal AS p ON a.empleado_id = p.id
+            LEFT JOIN cargo AS c ON p.cargo_id = c.id
+            LEFT JOIN estado AS ed ON a.estado = ed.id
+        WHERE 
+            bm.serial = '${safedSn}';`;
     }
 
     const data = await pool.query(query);
