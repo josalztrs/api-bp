@@ -19,16 +19,33 @@ const app = express();
 // ===== MIDDLEWARES =====
 app.use(helmet());
 
-// OJO ESTO SE TIENE QUE MODIFICAR CUANDO SE ALOJE EN UN SERVER
-// app.use(cors({
-// origin: config.ALLOWED_ORIGINS,
-// credentials: true
-// }));
+const whitelist = [
+    'http://localhost',      // Origen por defecto de Capacitor en Android
+    'capacitor://localhost', // Origen por defecto en iOS
+    'http://localhost:8100'  // Para cuando pruebas con el navegador
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Las APKs a veces no envían 'Origin' en peticiones simples. 
+        // Permitir !origin es vital para apps móviles y Postman.
+        if (!origin || whitelist.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS bloqueado para este origen'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
 app.use(compression({
     level: 6,
     threshold: 100 // Comprime respuestas > 100 bytes
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting global
 const globalLimiter = rateLimit({
@@ -67,7 +84,7 @@ app.use(errorHandler);
 
 // ===== INICIAR SERVIDOR =====
 function startServer() {
-    const server = app.listen(config.PORT, () => {
+    const server = app.listen(config.PORT, '0.0.0.0', () => {
         logger.info(`Servidor API en puerto ${config.PORT}`);
         logger.info(`Base de datos: ${config.DB_PATH}`);
         // Configurar timeouts

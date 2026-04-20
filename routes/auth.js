@@ -9,7 +9,7 @@ const { checkRateLimit } = require('../utils/rateLimit');
 
 router.post('/login', async (req, res, next) => {
     try {
-        const pin = req.body.pin || req.query.pin; // Soporta body o query
+        const pin = req.body?.pin || req.query.pin; // Soporta body o query
 
         // Validar
         const { error } = validate(pin, schemas.pin);

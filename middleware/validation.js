@@ -11,7 +11,7 @@ const schemas = {
         }),
 
     pin: Joi.string()
-        .pattern(/^\d{10}$/)
+        .pattern(/^\d{5}$/)
         .required()
         .messages({
             'string.pattern.base': 'PIN debe contener 10 dígitos'

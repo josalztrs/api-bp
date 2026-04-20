@@ -50,3 +50,34 @@
 {"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T17:17:05.886Z"}
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-20T17:17:36.325Z"}
 {"level":"info","message":"Equipo encontrado: 1001","timestamp":"2026-04-20T17:17:52.924Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T19:02:36.978Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T19:02:36.991Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T19:02:36.992Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T19:05:56.309Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T19:05:56.323Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T19:05:56.325Z"}
+{"level":"error","message":"Error en login: Cannot read properties of undefined (reading 'pin')","timestamp":"2026-04-20T19:08:14.939Z"}
+{"level":"error","message":"Error no capturado: Cannot read properties of undefined (reading 'pin')","stack":"TypeError: Cannot read properties of undefined (reading 'pin')\n    at C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\routes\\auth.js:12:30\n    at Layer.handleRequest (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:291:5)\n    at Function.handle (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:186:3)","timestamp":"2026-04-20T19:08:14.946Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T19:08:57.320Z"}
+{"level":"error","message":"Error en login: Cannot read properties of undefined (reading 'pin')","timestamp":"2026-04-20T19:09:45.203Z"}
+{"level":"error","message":"Error no capturado: Cannot read properties of undefined (reading 'pin')","stack":"TypeError: Cannot read properties of undefined (reading 'pin')\n    at C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\routes\\auth.js:12:30\n    at Layer.handleRequest (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:291:5)\n    at Function.handle (C:\\Users\\Jose\\Desktop\\api\\API-PROYECTO\\node_modules\\router\\index.js:186:3)","timestamp":"2026-04-20T19:09:45.208Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T19:15:50.489Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T19:15:50.502Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T19:15:50.504Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T19:18:13.442Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T19:18:13.454Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T19:18:13.455Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T22:30:08.847Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T22:30:08.874Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T22:30:08.875Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T22:40:38.390Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T22:40:38.428Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T22:40:38.429Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:40:52.543Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T22:43:17.669Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T22:43:17.718Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T22:43:17.720Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:23.523Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:32.365Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:39.532Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:43.444Z"}
