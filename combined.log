@@ -99,3 +99,10 @@
 {"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-21T14:15:06.157Z"}
 {"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-21T14:15:06.159Z"}
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-21T14:16:24.964Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T15:26:58.841Z"}
+{"level":"warn","message":"Intento de login con PIN incorrecto","timestamp":"2026-04-21T15:27:28.839Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-21T16:36:43.809Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-21T16:36:43.855Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-21T16:36:43.857Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T16:36:58.477Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T17:07:33.529Z"}
