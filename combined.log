@@ -81,3 +81,21 @@
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:32.365Z"}
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:39.532Z"}
 {"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:43:43.444Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-20T22:45:53.074Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-20T22:45:53.101Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-20T22:45:53.103Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:54:14.907Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:54:26.865Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T22:55:58.350Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-20T23:00:35.993Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-21T12:23:47.942Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-21T12:23:47.966Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-21T12:23:47.967Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T13:47:20.455Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T13:49:58.529Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T14:02:09.444Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T14:02:38.395Z"}
+{"level":"info","message":"Pool ODBC inicializado (size: 2-10, timeout: 30s)","timestamp":"2026-04-21T14:15:06.132Z"}
+{"level":"info","message":"Servidor API en puerto 3001","timestamp":"2026-04-21T14:15:06.157Z"}
+{"level":"info","message":"Base de datos: C:\\Users\\Jose\\Desktop\\api\\db.accdb","timestamp":"2026-04-21T14:15:06.159Z"}
+{"level":"info","message":"Login exitoso","timestamp":"2026-04-21T14:16:24.964Z"}

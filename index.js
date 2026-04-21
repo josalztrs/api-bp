@@ -35,7 +35,7 @@ app.use(cors({
             callback(new Error('CORS bloqueado para este origen'));
         }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting global
 const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 100,
     message: 'Demasiadas solicitudes'
 });
