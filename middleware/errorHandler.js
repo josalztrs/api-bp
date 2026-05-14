@@ -1,11 +1,11 @@
-const logger = require('../utils/logger');
+const logger = require('../utils/logger').child('ERROR');
 const config = require('../config/config');
 
 function errorHandler(err, req, res, next) {
-    logger.error('Error no capturado:', err);
-
-    const isDev = config.NODE_ENV === 'development';
     const statusCode = err.statusCode || 500;
+    const isDev = config.NODE_ENV === 'development';
+
+    logger.error(`${req.method} ${req.originalUrl} — ${err.message}`, err);
 
     return res.status(statusCode).json({
         error: err.message || 'Error interno del servidor',

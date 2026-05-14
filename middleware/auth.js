@@ -1,13 +1,13 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-const logger = require('../utils/logger');
+const logger = require('../utils/logger').child('AUTH');
 
 function authMiddleware(req, res, next) {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
 
         if (!token) {
-            logger.warn('Acceso sin token desde IP: ' + req.ip);
+            logger.warn('Acceso denegado — sin token', { ip: req.ip, url: req.originalUrl });
             return res.status(401).json({ error: 'Acceso denegado. Token requerido.' });
         }
 
@@ -15,7 +15,7 @@ function authMiddleware(req, res, next) {
         req.user = decoded;
         next();
     } catch (error) {
-        logger.warn('Token inválido desde IP: ' + req.ip);
+        logger.warn('Token inválido o expirado', { ip: req.ip, url: req.originalUrl });
         return res.status(400).json({ error: 'Token inválido o expirado' });
     }
 }

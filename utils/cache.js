@@ -1,6 +1,6 @@
 const NodeCache = require('node-cache');
 const config = require('../config/config');
-const logger = require('./logger');
+const logger = require('./logger').child('CACHE');
 
 // Cache con TTL de 5 minutos (300 segundos)
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });

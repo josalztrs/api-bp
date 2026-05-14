@@ -1,8 +1,7 @@
 const odbc = require('odbc');
-const logger = require('../utils/logger');
+const logger = require('../utils/logger').child('DB');
 const config = require('../config/config');
 const cache = require('../utils/cache');
-const { parse } = require('dotenv');
 
 let pool;
 
@@ -19,10 +18,10 @@ async function initializePool() {
             reuseConnections: true
         });
 
-        logger.info('Pool ODBC inicializado (size: 2-10, timeout: 30s)');
+        logger.info('Pool ODBC inicializado correctamente', { poolSize: '2-10', timeout: '30s' });
         return true;
     } catch (error) {
-        logger.error('Error inicializando Pool ODBC:', error);
+        logger.error('Error inicializando Pool ODBC', error);
         return false;
     }
 }
@@ -46,14 +45,15 @@ async function queryEquipo(sn, deptoscan) {
         const insertQuery = `
         INSERT INTO HISTORIAL_ESCANEOS (SERIAL, DPTO_ESCANEO, DETALLES, F_ESCANEO)
         VALUES (${hSerial}, ${hDeptoEscaneo}, 'EQUIPO NO REGISTRADO EN INVENTARIO', Now());
-        return { error: true, message: "El equipo no está registrado en el inventario" };
         `;
 
         try {
             await pool.query(insertQuery);
+            logger.warn('Equipo no registrado en inventario', { serial: sn, depto: deptoscan });
         } catch (err) {
-            console.error("Error al guardar historial:", err);
+            logger.error('Error al guardar historial (equipo no registrado)', err);
         }
+        return { error: true, message: "El equipo no está registrado en el inventario" };
     }
 
     const checkSinAsignacion = `
@@ -82,8 +82,9 @@ async function queryEquipo(sn, deptoscan) {
 
     try {
         await pool.query(insertQuery);
+        logger.warn('Equipo sin asignación vigente', { serial: sn, depto: deptoscan });
     } catch (err) {
-        console.error("Error al guardar historial:", err);
+        logger.error('Error al guardar historial (sin asignación)', err);
     }
         return { error: true, message: "Equipo tecnológico sin asignación vigente" };
     }
@@ -152,8 +153,9 @@ async function queryEquipo(sn, deptoscan) {
 
     try {
         await pool.query(insertQuery);
+        logger.info('Escaneo registrado en historial', { serial: sn, responsable: equipo.TRAB_NOM, depto: equipo.DEPTO });
     } catch (err) {
-        console.error("Error al guardar historial:", err);
+        logger.error('Error al guardar historial de escaneo', err);
     }
 
     return data;
@@ -179,7 +181,7 @@ async function checkHealth() {
 async function closePool() {
     if (pool) {
         await pool.close();
-        logger.info('Pool ODBC cerrado');
+        logger.info('Pool ODBC cerrado correctamente');
     }
 }
 

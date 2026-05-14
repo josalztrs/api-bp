@@ -10,6 +10,9 @@ const logger = require('./utils/logger');
 const database = require('./services/db');
 const errorHandler = require('./middleware/errorHandler');
 
+// Loggers por módulo
+const log = logger.child('SERVER');
+
 // Rutas
 const equipoRoutes = require('./routes/equipo');
 const authRoutes = require('./routes/auth');
@@ -18,6 +21,9 @@ const app = express();
 
 // ===== MIDDLEWARES =====
 app.use(helmet());
+
+// Request logger — registra cada petición HTTP en consola y archivo
+app.use(logger.requestLogger());
 
 const whitelist = [
     'http://localhost',      // Origen por defecto de Capacitor en Android
@@ -32,6 +38,7 @@ app.use(cors({
         if (!origin || whitelist.includes(origin)) {
             callback(null, true);
         } else {
+            log.warn('CORS bloqueado', { origin });
             callback(new Error('CORS bloqueado para este origen'));
         }
     },
@@ -61,7 +68,7 @@ app.use(globalLimiter);
     if (dbReady) {
         startServer();
     } else {
-        logger.error('No se pudo inicializar la base de datos');
+        log.error('No se pudo inicializar la base de datos — cerrando proceso');
         process.exit(1);
     }
 })();
@@ -74,7 +81,7 @@ app.get('/api/v1/status', async (req, res, next) => {
         await database.checkHealth();
         return res.status(200).json({ status: 'up', message: 'OK' });
     } catch (error) {
-        logger.error('Health check failed:', error);
+        log.error('Health check falló', error);
         return res.status(503).json({ status: 'down', message: 'Error conectando a BD' });
     }
 });
@@ -85,8 +92,9 @@ app.use(errorHandler);
 // ===== INICIAR SERVIDOR =====
 function startServer() {
     const server = app.listen(config.PORT, '0.0.0.0', () => {
-        logger.info(`Servidor API en puerto ${config.PORT}`);
-        logger.info(`Base de datos: ${config.DB_PATH}`);
+        // Mostrar banner de arranque
+        logger.banner(config.PORT, config.DB_PATH);
+
         // Configurar timeouts
         server.timeout = 30000;              // 30s timeout global
         server.keepAliveTimeout = 65000;     // 65s keep-alive
@@ -95,9 +103,19 @@ function startServer() {
 
     // Graceful shutdown
     process.on('SIGTERM', async () => {
-        logger.info('SIGTERM recibido, cerrando servidor...');
+        log.warn('SIGTERM recibido — iniciando apagado graceful...');
         server.close(async () => {
             await database.closePool();
+            log.info('Servidor cerrado correctamente');
+            process.exit(0);
+        });
+    });
+
+    process.on('SIGINT', async () => {
+        log.warn('SIGINT recibido — cerrando...');
+        server.close(async () => {
+            await database.closePool();
+            log.info('Servidor cerrado correctamente');
             process.exit(0);
         });
     });
