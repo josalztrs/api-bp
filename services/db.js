@@ -2,6 +2,7 @@ const odbc = require('odbc');
 const logger = require('../utils/logger');
 const config = require('../config/config');
 const cache = require('../utils/cache');
+const { parse } = require('dotenv');
 
 let pool;
 
@@ -26,83 +27,148 @@ async function initializePool() {
     }
 }
 
-async function queryEquipo(sn) {
-    const cacheKey = `equipo_${sn.toLowerCase()}`;
-
-    // Busca en caché primero
-    const cachedData = cache.getFromCache(cacheKey);
-    if (cachedData) {
-        return cachedData;
-    }
-
+async function queryEquipo(sn, deptoscan) {
     if (!pool) throw new Error('Base de datos no disponible');
 
-    const parsedSn = isNaN(Number(sn)) ? sn : Number(sn);
-    let query;
+    const safedSn = `'${String(sn).replace(/'/g, "''")}'`;
 
-    if (typeof parsedSn === 'number') {
-        query = `SELECT 
-            bm.serial,
-            bm.observaciones AS bien_observaciones,
-            bm.fecha_compra,
-            m.nombre_marca,
-            d.nombre_dpto AS departamento,
-            e.estado_bien AS estado_bien,
-            a.fecha_asign,
-            a.estado AS asignacion_estado_id,
-            p.cedula,
-            p.nombre AS empleado_nombre,
-            c.nombre_cargo,
-            ed.estado_bien AS asignacion_estado
-        FROM 
-            ((((bienes_muebles AS bm 
-            INNER JOIN marca AS m ON bm.marca_id = m.id)
-            INNER JOIN departamento AS d ON bm.depto_id = d.id)
-            INNER JOIN estado AS e ON bm.estado_id = e.id)
-            LEFT JOIN (asignaciones AS a 
-                LEFT JOIN (personal AS p 
-                    LEFT JOIN cargo AS c ON p.cargo_id = c.id) 
-                ON a.empleado_id = p.id)
-            ON bm.serial = a.serial)
-            LEFT JOIN estado AS ed ON a.estado = ed.id
-        WHERE 
-            bm.serial = '${parsedSn}';`;
-    } else {
-        const safedSn = parsedSn.replace(/'/g, "''");
-        query = `SELECT 
-            bm.serial,
-            bm.observaciones AS bien_observaciones,
-            bm.fecha_compra,
-            m.nombre_marca,
-            d.nombre_dpto AS departamento,
-            e.estado_bien AS estado_bien,
-            a.fecha_asign,
-            a.estado AS asignacion_estado_id,
-            p.cedula,
-            p.nombre AS empleado_nombre,
-            c.nombre_cargo,
-            ed.estado_bien AS asignacion_estado
-        FROM 
-            (bienes_muebles AS bm
-            INNER JOIN marca AS m ON bm.marca_id = m.id)
-            INNER JOIN departamento AS d ON bm.depto_id = d.id
-            INNER JOIN estado AS e ON bm.estado_id = e.id
-            LEFT JOIN asignaciones AS a ON bm.serial = a.serial
-            LEFT JOIN personal AS p ON a.empleado_id = p.id
-            LEFT JOIN cargo AS c ON p.cargo_id = c.id
-            LEFT JOIN estado AS ed ON a.estado = ed.id
-        WHERE 
-            bm.serial = '${safedSn}';`;
+    const checkExistencia = `
+        SELECT TOP 1 ID, [CODIGO DE ORIGEN]
+        FROM [DETALLE POR BIENES]
+        WHERE [CODIGO DE ORIGEN] = ${safedSn};
+    `;
+    
+    const existeBien = await pool.query(checkExistencia);
+
+    if (!existeBien || existeBien.length === 0) {
+        const hSerial = `'${String(sn).replace(/'/g, "''")}'`;
+        const hDeptoEscaneo = `'${String(deptoscan ?? '').replace(/'/g, "''")}'`;
+        const insertQuery = `
+        INSERT INTO HISTORIAL_ESCANEOS (SERIAL, DPTO_ESCANEO, DETALLES, F_ESCANEO)
+        VALUES (${hSerial}, ${hDeptoEscaneo}, 'EQUIPO NO REGISTRADO EN INVENTARIO', Now());
+        return { error: true, message: "El equipo no está registrado en el inventario" };
+        `;
+
+        try {
+            await pool.query(insertQuery);
+        } catch (err) {
+            console.error("Error al guardar historial:", err);
+        }
     }
+
+    const checkSinAsignacion = `
+        SELECT TOP 1 B_DET.ID
+        FROM [DETALLE POR BIENES] AS B_DET 
+        INNER JOIN BIENES AS B ON B_DET.[BIEN MUEBLE] = B.Id1
+        WHERE B_DET.[CODIGO DE ORIGEN] = ${safedSn}
+        AND B.TECNOLOGICO = True
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM ASIGNACION AS A 
+            WHERE A.CODIGO = B_DET.ID
+        );
+    `;
+
+    const unassignedData = await pool.query(checkSinAsignacion);
+
+    // Si la consulta devuelve algo, significa que el equipo EXISTE pero NO tiene asignación
+    if (unassignedData && unassignedData.length > 0) {
+        const hSerial = `'${String(sn).replace(/'/g, "''")}'`;
+        const hDeptoEscaneo = `'${String(deptoscan ?? '').replace(/'/g, "''")}'`;
+        const insertQuery = `
+        INSERT INTO HISTORIAL_ESCANEOS (SERIAL, DPTO_ESCANEO, DETALLES, F_ESCANEO)
+        VALUES (${hSerial}, ${hDeptoEscaneo}, 'EQUIPO SIN ASIGNACIÓN VIGENTE', Now());
+    `;
+
+    try {
+        await pool.query(insertQuery);
+    } catch (err) {
+        console.error("Error al guardar historial:", err);
+    }
+        return { error: true, message: "Equipo tecnológico sin asignación vigente" };
+    }
+
+    //CONSULTA PRINCIPAL (Detalles de la asignación)
+    const query = `
+        SELECT
+            A.F_ASIGNACION AS F_ASIG,
+            UBI.UNIDAD AS DEPTO,
+            EST.ESTADO,
+            T.NOMBRE AS TRAB_NOM,
+            C.CARGO AS TRAB_CARGO,
+            D.DIVISION AS TRAB_DIV,
+            B_DET.[CODIGO DE ORIGEN] AS SERIAL,
+            B.[BIEN MUEBLE] AS CATEG_BIEN,
+            GR.GRUPO AS CLASE_BIEN,
+            M.MARCA,
+            B_DET.MODELO,
+            B_DET.DESCRIPCION,
+            B_DET.PROPIETARIO,
+            CD.CONDICION AS TENENCIA
+        FROM ((((((((((((((ASIGNACION AS A
+            LEFT JOIN [TRABAJADOR] AS T ON A.USUARIO = T.CI)
+            LEFT JOIN [CARGO] AS C ON T.CARGO = C.Id)
+            LEFT JOIN [DIVISION] AS D ON T.DIVISION = D.Id)
+            LEFT JOIN [DETALLE POR BIENES] AS B_DET ON A.CODIGO = B_DET.ID)
+            LEFT JOIN [BIENES] AS B ON B_DET.[BIEN MUEBLE] = B.Id1)
+            LEFT JOIN [FIRMAS] AS FIR ON A.FIRMA = FIR.Id)
+            LEFT JOIN [TRABAJADOR] AS T1 ON FIR.GTE_GRAL = T1.CI)
+            LEFT JOIN [TRABAJADOR] AS T2 ON FIR.TIC = T2.CI)
+            LEFT JOIN [TRABAJADOR] AS T4 ON D.ENCARGADO = T4.CI)
+            LEFT JOIN [UBICACION] AS UBI ON A.UBICACION = UBI.Id)
+            LEFT JOIN [ESTADO] AS EST ON A.ESTADO = EST.Id)
+            LEFT JOIN [FUNCIÓN] AS F ON T.FUNCION = F.Id)
+            LEFT JOIN [MARCAS] AS M ON B_DET.MARCA = M.Id)
+            LEFT JOIN [CONDICION] AS CD ON B_DET.CONDICION = CD.CONDICION)
+            LEFT JOIN [GRUPO] AS GR ON B.GRUPO = GR.Id
+        WHERE B_DET.[CODIGO DE ORIGEN] = ${safedSn}
+        AND A.F_ASIGNACION = (
+            SELECT MAX(F_ASIGNACION)
+            FROM ASIGNACION
+            WHERE CODIGO = B_DET.ID
+        );
+    `;
 
     const data = await pool.query(query);
 
-    // Guarda en caché si hay resultados
-    if (data && data.length > 0) {
-        cache.setInCache(cacheKey, data);
+    // Si no está en "Sin Asignación" pero tampoco devuelve datos aquí, 
+    // el equipo probablemente no existe en la base de datos.
+    if (!data || data.length === 0) {
+        return { error: true, message: "Equipo no encontrado en el sistema" };
+    }
+
+    // 3. REGISTRO EN HISTORIAL (Solo si hay datos)
+    const equipo = data[0];
+    const hSerial = `'${String(equipo.SERIAL).replace(/'/g, "''")}'`;
+    const hPAsign = `'${String(equipo.TRAB_NOM).replace(/'/g, "''")}'`;
+    const hDeptoAsign = `'${String(equipo.DEPTO).replace(/'/g, "''")}'`;
+    const hDeptoEscaneo = `'${String(deptoscan ?? '').replace(/'/g, "''")}'`;
+    const hDetalles = `'${String(equipo.CATEG_BIEN).replace(/'/g, "''")} ${String(equipo.MODELO).replace(/'/g, "''")}'`;
+
+    const insertQuery = `
+        INSERT INTO HISTORIAL_ESCANEOS (SERIAL, PERS_ASIGN, DPTO_ASIGN, DPTO_ESCANEO, DETALLES, F_ESCANEO)
+        VALUES (${hSerial}, ${hPAsign}, ${hDeptoAsign}, ${hDeptoEscaneo}, ${hDetalles}, Now());
+    `;
+
+    try {
+        await pool.query(insertQuery);
+    } catch (err) {
+        console.error("Error al guardar historial:", err);
     }
 
     return data;
+}
+
+async function queryUbicaciones() {
+    if (!pool) throw new Error('Base de datos no disponible');
+
+    // Requerimiento: SELECT * en UBICACION y retornar esos datos
+    const query = `
+        SELECT *
+        FROM [UBICACION];
+    `;
+
+    return await pool.query(query);
 }
 
 async function checkHealth() {
@@ -120,6 +186,7 @@ async function closePool() {
 module.exports = {
     initializePool,
     queryEquipo,
+    queryUbicaciones,
     checkHealth,
     closePool
 };

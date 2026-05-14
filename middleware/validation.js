@@ -15,6 +15,13 @@ const schemas = {
         .required()
         .messages({
             'string.pattern.base': 'PIN debe contener 10 dígitos'
+        }),
+
+    id: Joi.string()
+        .pattern(/^\d+$/)
+        .required()
+        .messages({
+            'string.pattern.base': 'ID Incorrecto'
         })
 };
 

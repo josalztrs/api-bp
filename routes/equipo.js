@@ -6,9 +6,20 @@ const database = require('../services/db');
 const logger = require('../utils/logger');
 const { lastRequestTimes, checkRateLimit } = require('../utils/rateLimit');
 
+router.get('/deptos', auth, async (req, res, next) => {
+    try {
+        const data = await database.queryUbicaciones();
+        return res.status(200).json(data);
+    } catch (error) {
+        logger.error(`Error en /equipo/deptos - ${error.message}`);
+        next(error);
+    }
+});
+
 router.get('/:sn', auth, async (req, res, next) => {
     try {
         let { sn } = req.params;
+        const deptoscan = (req.query?.deptoscan ?? '').toString();
 
         // Validar entrada
         const { error } = validate(sn, schemas.sn);
@@ -30,7 +41,7 @@ router.get('/:sn', auth, async (req, res, next) => {
         }
 
         // Query
-        const data = await database.queryEquipo(sn);
+        const data = await database.queryEquipo(sn, deptoscan);
 
         if (!data || data.length === 0) {
             return res.status(404).json({ error: 'Equipo no encontrado' });
