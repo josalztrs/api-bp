@@ -1,4 +1,5 @@
-# MS Access API - Node.js
+# MS Access API - Node.js para el escáner de bienes nacionales de la empresa BOLIPUERTOS S.A
+### Por razones de seguridad, este proyecto refleja una versión temprana de la API.
 
 API de solo lectura construida con Node.js, Express y odbc para consultar una base de datos Microsoft Access externa preexistente.
 
